@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using VacationRental.Api.Domain.DTOs;
+using VacationRental.Api.Domain.Interfaces;
 using VacationRental.Api.Models;
 
 namespace VacationRental.Api.Controllers
@@ -11,13 +13,16 @@ namespace VacationRental.Api.Controllers
     {
         private readonly IDictionary<int, RentalViewModel> _rentals;
         private readonly IDictionary<int, BookingViewModel> _bookings;
+        private readonly IBookingService _bookingService;
 
         public BookingsController(
             IDictionary<int, RentalViewModel> rentals,
-            IDictionary<int, BookingViewModel> bookings)
+            IDictionary<int, BookingViewModel> bookings,
+            IBookingService bookingService)
         {
             _rentals = rentals;
             _bookings = bookings;
+            _bookingService = bookingService;
         }
 
         [HttpGet]
@@ -38,35 +43,49 @@ namespace VacationRental.Api.Controllers
             if (!_rentals.ContainsKey(model.RentalId))
                 throw new ApplicationException("Rental not found");
 
-            for (var i = 0; i < model.Nights; i++)
+            try
             {
-                var count = 0;
-                foreach (var booking in _bookings.Values)
+                var addBookingDtoRequest = new AddBookingDtoRequest()
                 {
-                    if (booking.RentalId == model.RentalId
-                        && (booking.Start <= model.Start.Date && booking.Start.AddDays(booking.Nights) > model.Start.Date)
-                        || (booking.Start < model.Start.AddDays(model.Nights) && booking.Start.AddDays(booking.Nights) >= model.Start.AddDays(model.Nights))
-                        || (booking.Start > model.Start && booking.Start.AddDays(booking.Nights) < model.Start.AddDays(model.Nights)))
+                    Nights = model.Nights,
+                    RentalId = model.RentalId,
+                    Start = model.Start
+                };
+
+                for (var i = 0; i < model.Nights; i++)
+                {
+                    var count = 0;
+                    foreach (var booking in _bookings.Values)
                     {
-                        count++;
+                        if (booking.RentalId == model.RentalId
+                            && (booking.Start <= model.Start.Date && booking.Start.AddDays(booking.Nights) > model.Start.Date)
+                            || (booking.Start < model.Start.AddDays(model.Nights) && booking.Start.AddDays(booking.Nights) >= model.Start.AddDays(model.Nights))
+                            || (booking.Start > model.Start && booking.Start.AddDays(booking.Nights) < model.Start.AddDays(model.Nights)))
+                        {
+                            count++;
+                        }
                     }
+                    if (count >= _rentals[model.RentalId].Units)
+                        throw new ApplicationException("Not available");
                 }
-                if (count >= _rentals[model.RentalId].Units)
-                    throw new ApplicationException("Not available");
+
+
+                var key = new ResourceIdViewModel { Id = _bookings.Keys.Count + 1 };
+
+                _bookings.Add(key.Id, new BookingViewModel
+                {
+                    Id = key.Id,
+                    Nights = model.Nights,
+                    RentalId = model.RentalId,
+                    Start = model.Start.Date
+                });
+
+                return key;
             }
-
-
-            var key = new ResourceIdViewModel { Id = _bookings.Keys.Count + 1 };
-
-            _bookings.Add(key.Id, new BookingViewModel
+            catch(Exception error)
             {
-                Id = key.Id,
-                Nights = model.Nights,
-                RentalId = model.RentalId,
-                Start = model.Start.Date
-            });
-
-            return key;
+                throw new Exception($"Error calling post. Exception message is : {error.Message}");
+            }          
         }
     }
 }
