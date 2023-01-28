@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VacationRental.Api.Domain.DTOs;
 using VacationRental.Api.Domain.Interfaces;
 
@@ -28,14 +29,13 @@ namespace VacationRental.Api.Domain.Services
                         && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)
                     {
                         date.Bookings.Add(new CalendarBookingDto { Id = booking.Id });
+                        if(date.PreparationTimes?[i]?.Unit > 0 && date.PreparationTimes?[i]?.Unit == date.Bookings?.LastOrDefault()?.Unit)
+                        {
+                            date.Date.AddDays((double)(date.PreparationTimes?[i].Unit));
+                        }
                     }
                 }
 
-                if(rentals[i].Units == date.Bookings.Count 
-                    || rentals[i].Units == (date.Bookings.Count + rentals[i].PreparationTimeInDays))
-                {
-                    date.Date.AddDays(rentals[i].PreparationTimeInDays);
-                }
                 result.Dates.Add(date);
             }
             return new GetCaldendatDtoResponse() { Caldendar = result };
