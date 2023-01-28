@@ -8,5 +8,6 @@ namespace VacationRental.Api.Domain.DTOs
     {
         public int RentalId { get; set; }
         public List<CalendarDateDto> Dates { get; set; }
+        public List<int> PreparationTimes { get; set; }
     }
 }

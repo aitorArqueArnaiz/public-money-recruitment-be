@@ -46,7 +46,8 @@ namespace VacationRental.Api.Mappers
             return new CalendarDateViewModel()
             {
                 Bookings = model.Bookings.Select(elem => MapCalendarBookingModelIntoCalendarBookingDto(elem)).ToList(),
-                Date = model.Date
+                Date = model.Date,
+                PreparationTimes = model.PreparationTimes
             };
         }
 
