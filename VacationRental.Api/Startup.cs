@@ -33,6 +33,7 @@ namespace VacationRental.Api
 
             // Add application services.
             services.Add(new ServiceDescriptor(typeof(IBookingService), new BookingService()));
+            services.Add(new ServiceDescriptor(typeof(ICalendarService), new CaldendarService()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

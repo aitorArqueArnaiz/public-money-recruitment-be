@@ -1,4 +1,5 @@
-﻿using VacationRental.Api.Domain.DTOs;
+﻿using System.Linq;
+using VacationRental.Api.Domain.DTOs;
 using VacationRental.Api.Models;
 
 namespace VacationRental.Api.Mappers
@@ -22,6 +23,23 @@ namespace VacationRental.Api.Mappers
             {
                 Id = model.Id,
                 Units = model.Units
+            };
+        }
+
+        public static CalendarDateViewModel MapCalendarModelIntoCalendarDto(CalendarDateDto model)
+        {
+            return new CalendarDateViewModel()
+            {
+                Bookings = model.Bookings.Select(elem => MapCalendarBookingModelIntoCalendarBookingDto(elem)).ToList(),
+                Date = model.Date
+            };
+        }
+
+        public static CalendarBookingViewModel MapCalendarBookingModelIntoCalendarBookingDto(CalendarBookingDto model)
+        {
+            return new CalendarBookingViewModel()
+            {
+                Id = model.Id
             };
         }
     }
