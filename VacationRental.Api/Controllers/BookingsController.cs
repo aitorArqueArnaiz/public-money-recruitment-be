@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Domain.DTOs;
 using VacationRental.Api.Domain.Interfaces;
@@ -28,7 +29,7 @@ namespace VacationRental.Api.Controllers
 
         [HttpGet]
         [Route("{bookingId:int}")]
-        public BookingViewModel Get(int bookingId)
+        public async Task<BookingViewModel> Get(int bookingId)
         {
             if (!_bookings.ContainsKey(bookingId))
                 throw new ApplicationException("Booking not found");
@@ -37,7 +38,7 @@ namespace VacationRental.Api.Controllers
         }
 
         [HttpPost]
-        public ResourceIdViewModel Post(BookingBindingModel model)
+        public async Task<ResourceIdViewModel> Post(BookingBindingModel model)
         {
             if (model.Nights <= 0)
                 throw new ApplicationException("Nigts must be positive");

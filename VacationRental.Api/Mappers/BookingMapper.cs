@@ -6,6 +6,11 @@ namespace VacationRental.Api.Mappers
 {
     public static class BookingMapper
     {
+        /// <summary>
+        /// Converts BookingViewModel into BookingDto object.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static BookingDto MapBookingModelIntoBookingDto(BookingViewModel model)
         {
             return new BookingDto()
@@ -17,6 +22,11 @@ namespace VacationRental.Api.Mappers
             };
         }
 
+        /// <summary>
+        /// Converts RentalViewModel into RentalDto object.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static RentalDto MapRentalModelIntoRentalDto(RentalViewModel model)
         {
             return new RentalDto()
@@ -26,6 +36,11 @@ namespace VacationRental.Api.Mappers
             };
         }
 
+        /// <summary>
+        /// Converts CalendarDateDto into CalendarDateViewModel object.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static CalendarDateViewModel MapCalendarModelIntoCalendarDto(CalendarDateDto model)
         {
             return new CalendarDateViewModel()
@@ -35,6 +50,11 @@ namespace VacationRental.Api.Mappers
             };
         }
 
+        /// <summary>
+        /// Converts CalendarBookingDto into CalendarBookingViewModel object.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static CalendarBookingViewModel MapCalendarBookingModelIntoCalendarBookingDto(CalendarBookingDto model)
         {
             return new CalendarBookingViewModel()
