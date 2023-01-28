@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Domain.DTOs;
 using VacationRental.Api.Domain.Interfaces;
+using VacationRental.Api.Mappers;
 using VacationRental.Api.Models;
 
 namespace VacationRental.Api.Controllers
@@ -51,26 +52,18 @@ namespace VacationRental.Api.Controllers
                     RentalId = model.RentalId,
                     Start = model.Start
                 };
-
-                for (var i = 0; i < model.Nights; i++)
+                var domainBookings = new Dictionary<int, BookingDto>();
+                var domainRentals = new Dictionary<int, RentalDto>();
+                foreach(var booking in _bookings)
                 {
-                    var count = 0;
-                    foreach (var booking in _bookings.Values)
-                    {
-                        if (booking.RentalId == model.RentalId
-                            && (booking.Start <= model.Start.Date && booking.Start.AddDays(booking.Nights) > model.Start.Date)
-                            || (booking.Start < model.Start.AddDays(model.Nights) && booking.Start.AddDays(booking.Nights) >= model.Start.AddDays(model.Nights))
-                            || (booking.Start > model.Start && booking.Start.AddDays(booking.Nights) < model.Start.AddDays(model.Nights)))
-                        {
-                            count++;
-                        }
-                    }
-                    if (count >= _rentals[model.RentalId].Units)
-                        throw new ApplicationException("Not available");
+                    domainBookings.Add(booking.Key, BookingMapper.MapBookingModelIntoBookingDto(booking.Value));
                 }
-
-
-                var key = new ResourceIdViewModel { Id = _bookings.Keys.Count + 1 };
+                foreach (var rental in _rentals)
+                {
+                    domainRentals.Add(rental.Key, BookingMapper.MapRentalModelIntoRentalDto(rental.Value));
+                }
+                var response = _bookingService.AddBooking(addBookingDtoRequest, domainBookings, domainRentals);
+                var key = new ResourceIdViewModel { Id = response.Id };
 
                 _bookings.Add(key.Id, new BookingViewModel
                 {

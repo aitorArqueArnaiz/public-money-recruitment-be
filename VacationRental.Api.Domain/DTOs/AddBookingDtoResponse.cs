@@ -2,5 +2,6 @@
 {
     public class  AddBookingDtoResponse
     {
+        public int Id { get; set; }
     }
 }
