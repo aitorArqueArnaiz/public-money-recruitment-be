@@ -7,6 +7,11 @@ namespace VacationRental.Api.Domain.DTOs
     {
         public DateTime Date { get; set; }
         public List<CalendarBookingDto> Bookings { get; set; }
-        public List<int> PreparationTimes { get; set; }
+        public List<UnitDto> PreparationTimes { get; set; }
+    }
+
+    public class UnitDto
+    {
+        public int Unit { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace VacationRental.Api.Domain.Services
 {
     public class CaldendarService : ICalendarService
     {
-        public GetCaldendatDtoResponse GetCaldendarInformation(GetCaldendarDtoRequest request, IDictionary<int, BookingDto> bookings)
+        public GetCaldendatDtoResponse GetCaldendarInformation(GetCaldendarDtoRequest request, IDictionary<int, BookingDto> bookings, IDictionary<int, RentalDto> rentals)
         {
             var result = new CalendarDto
             {
@@ -31,6 +31,11 @@ namespace VacationRental.Api.Domain.Services
                     }
                 }
 
+                if(rentals[i].Units == date.Bookings.Count 
+                    || rentals[i].Units == (date.Bookings.Count + rentals[i].PreparationTimeInDays))
+                {
+                    date.Date.AddDays(rentals[i].PreparationTimeInDays);
+                }
                 result.Dates.Add(date);
             }
             return new GetCaldendatDtoResponse() { Caldendar = result };

@@ -36,25 +36,37 @@ namespace VacationRental.Api.Controllers
             if (!_rentals.ContainsKey(rentalId))
                 throw new ApplicationException("Rental not found");
 
-            var getCalendarInfoDto = new GetCaldendarDtoRequest()
+            try
             {
-                Nights = nights,
-                RentalId = rentalId,
-                Start = start
-            };
-            var domainBookings = new Dictionary<int, BookingDto>();
-            foreach (var booking in _bookings)
-            {
-                domainBookings.Add(booking.Key, BookingMapper.MapBookingModelIntoBookingDto(booking.Value));
-            }
-            var response = _calendarService.GetCaldendarInformation(getCalendarInfoDto, domainBookings);
-            var result = new CalendarViewModel()
-            {
-                Dates = response.Caldendar.Dates.Select(elem => BookingMapper.MapCalendarModelIntoCalendarDto(elem)).ToList(),
-                RentalId = response.Caldendar.RentalId
-            };
+                var getCalendarInfoDto = new GetCaldendarDtoRequest()
+                {
+                    Nights = nights,
+                    RentalId = rentalId,
+                    Start = start
+                };
+                var domainBookings = new Dictionary<int, BookingDto>();
+                var domainRentals = new Dictionary<int, RentalDto>();
+                foreach (var booking in _bookings)
+                {
+                    domainBookings.Add(booking.Key, BookingMapper.MapBookingModelIntoBookingDto(booking.Value));
+                }
+                foreach (var rental in _rentals)
+                {
+                    domainRentals.Add(rental.Key, BookingMapper.MapRentalModelIntoRentalDto(rental.Value));
+                }
+                var response = _calendarService.GetCaldendarInformation(getCalendarInfoDto, domainBookings, domainRentals);
+                var result = new CalendarViewModel()
+                {
+                    Dates = response.Caldendar.Dates.Select(elem => BookingMapper.MapCalendarModelIntoCalendarDto(elem)).ToList(),
+                    RentalId = response.Caldendar.RentalId
+                };
 
-            return result;
+                return result;
+            }
+            catch(Exception error)
+            {
+                throw new Exception($"Error calling calendar get. Exception message is : {error.Message}");
+            }
         }
     }
 }

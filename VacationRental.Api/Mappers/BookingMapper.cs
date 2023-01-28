@@ -32,7 +32,8 @@ namespace VacationRental.Api.Mappers
             return new RentalDto()
             {
                 Id = model.Id,
-                Units = model.Units
+                Units = model.Units,
+                PreparationTimeInDays = model.PreparationTimeInDays
             };
         }
 
@@ -60,7 +61,8 @@ namespace VacationRental.Api.Mappers
         {
             return new CalendarBookingViewModel()
             {
-                Id = model.Id
+                Id = model.Id,
+                Unit = model.Unit,
             };
         }
     }

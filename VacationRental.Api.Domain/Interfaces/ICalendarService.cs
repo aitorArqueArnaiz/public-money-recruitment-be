@@ -5,6 +5,6 @@ namespace VacationRental.Api.Domain.Interfaces
 {
     public interface ICalendarService
     {
-        GetCaldendatDtoResponse GetCaldendarInformation(GetCaldendarDtoRequest request, IDictionary<int, BookingDto> bookings);
+        GetCaldendatDtoResponse GetCaldendarInformation(GetCaldendarDtoRequest request, IDictionary<int, BookingDto> bookings, IDictionary<int, RentalDto> rentals);
     }
 }
