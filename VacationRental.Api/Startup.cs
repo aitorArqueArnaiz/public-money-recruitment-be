@@ -34,7 +34,7 @@ namespace VacationRental.Api
 
             // Add application services.
             services.Add(new ServiceDescriptor(typeof(IBookingService), new BookingService()));
-            services.Add(new ServiceDescriptor(typeof(ICalendarService), new CaldendarService()));
+            services.Add(new ServiceDescriptor(typeof(ICalendarService), new CalendarService()));
             services.Add(new ServiceDescriptor(typeof(IBookingRepository), new BookingRespository()));
             services.Add(new ServiceDescriptor(typeof(IRentalsRepository), new RentalRepository()));
         }

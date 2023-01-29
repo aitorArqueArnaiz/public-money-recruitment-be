@@ -34,7 +34,7 @@ namespace VacationRental.Api.Controllers
         {
             if (nights < 0)
                 throw new ApplicationException("Nights must be positive");
-            if (!_rentalRepositiry.GetRentalById(rentalId))
+            if (!_rentalRepositiry.KeyExist(rentalId))
                 throw new ApplicationException("Rental not found");
 
             try
@@ -66,7 +66,7 @@ namespace VacationRental.Api.Controllers
             }
             catch(Exception error)
             {
-                throw new Exception($"Error calling calendar get. Exception message is : {error.Message}");
+                throw new ApplicationException($"Error calling calendar get. Exception message is : {error.Message}");
             }
         }
     }

@@ -79,7 +79,7 @@ namespace VacationRental.Api.Controllers
             }
             catch(Exception error)
             {
-                throw new Exception($"Error calling post. Exception message is : {error.Message}");
+                throw new ApplicationException($"Error calling post. Exception message is : {error.Message}");
             }          
         }
     }

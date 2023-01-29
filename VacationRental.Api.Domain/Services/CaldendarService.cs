@@ -5,8 +5,12 @@ using VacationRental.Api.Domain.Interfaces;
 
 namespace VacationRental.Api.Domain.Services
 {
-    public class CaldendarService : ICalendarService
+    public class CalendarService : ICalendarService
     {
+        public CalendarService()
+        {
+        }
+
         public GetCaldendatDtoResponse GetCaldendarInformation(GetCaldendarDtoRequest request, IDictionary<int, BookingDto> bookings, IDictionary<int, RentalDto> rentals)
         {
             var result = new CalendarDto
@@ -44,7 +48,7 @@ namespace VacationRental.Api.Domain.Services
         /// <param name="date"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        private bool IsBlockedByPreparationDays(CalendarDateDto date, int index)
+        public bool IsBlockedByPreparationDays(CalendarDateDto date, int index)
         {
             if (date.PreparationTimes?[index]?.Unit > 0 && date.PreparationTimes?[index]?.Unit == date.Bookings?.LastOrDefault()?.Unit)
             {
