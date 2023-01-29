@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Domain.DTOs;
 using VacationRental.Api.Domain.Interfaces;
+using VacationRental.Api.Infrastructure.Repository;
 using VacationRental.Api.Mappers;
 using VacationRental.Api.Models;
 
@@ -14,17 +15,17 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class CalendarController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
-        private readonly IDictionary<int, BookingViewModel> _bookings;
         private readonly ICalendarService _calendarService;
+        private IBookingRepository _bookingRepositiry;
+        private IRentalsRepository _rentalRepositiry;
 
         public CalendarController(
-            IDictionary<int, RentalViewModel> rentals,
-            IDictionary<int, BookingViewModel> bookings,
+            IBookingRepository bookingRespository,
+            IRentalsRepository rentalRespository,
             ICalendarService caldendarService)
         {
-            _rentals = rentals;
-            _bookings = bookings;
+            _bookingRepositiry = bookingRespository;
+            _rentalRepositiry = rentalRespository;
             _calendarService = caldendarService;
         }
 
@@ -33,7 +34,7 @@ namespace VacationRental.Api.Controllers
         {
             if (nights < 0)
                 throw new ApplicationException("Nights must be positive");
-            if (!_rentals.ContainsKey(rentalId))
+            if (!_rentalRepositiry.GetRentalById(rentalId))
                 throw new ApplicationException("Rental not found");
 
             try
@@ -46,11 +47,11 @@ namespace VacationRental.Api.Controllers
                 };
                 var domainBookings = new Dictionary<int, BookingDto>();
                 var domainRentals = new Dictionary<int, RentalDto>();
-                foreach (var booking in _bookings)
+                foreach (var booking in _bookingRepositiry.GetAllBookings())
                 {
                     domainBookings.Add(booking.Key, BookingMapper.MapBookingModelIntoBookingDto(booking.Value));
                 }
-                foreach (var rental in _rentals)
+                foreach (var rental in _rentalRepositiry.GetAllRentals())
                 {
                     domainRentals.Add(rental.Key, BookingMapper.MapRentalModelIntoRentalDto(rental.Value));
                 }

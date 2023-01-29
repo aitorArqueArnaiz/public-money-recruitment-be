@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VacationRental.Api.Domain\VacationRental.Api.Domain.csproj" />
+    <ProjectReference Include="..\VacationRental.Api.Infrastructure\VacationRental.Api.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

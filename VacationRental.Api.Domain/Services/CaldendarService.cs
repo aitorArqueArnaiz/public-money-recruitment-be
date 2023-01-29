@@ -29,16 +29,29 @@ namespace VacationRental.Api.Domain.Services
                         && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)
                     {
                         date.Bookings.Add(new CalendarBookingDto { Id = booking.Id });
-                        if(date.PreparationTimes?[i]?.Unit > 0 && date.PreparationTimes?[i]?.Unit == date.Bookings?.LastOrDefault()?.Unit)
-                        {
-                            date.Date.AddDays((double)(date.PreparationTimes?[i].Unit));
-                        }
+                        var pDays = IsBlockedByPreparationDays(date, i);
                     }
                 }
 
                 result.Dates.Add(date);
             }
             return new GetCaldendatDtoResponse() { Caldendar = result };
+        }
+
+        /// <summary>
+        /// Checks for preparation days blocking if needed.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool IsBlockedByPreparationDays(CalendarDateDto date, int index)
+        {
+            if (date.PreparationTimes?[index]?.Unit > 0 && date.PreparationTimes?[index]?.Unit == date.Bookings?.LastOrDefault()?.Unit)
+            {
+                date.Date.AddDays((double)(date.PreparationTimes?[index].Unit));
+                return true;
+            }
+            return false;
         }
     }
 }
