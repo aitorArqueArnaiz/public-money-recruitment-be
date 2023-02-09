@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using VacationRental.Api.Domain.DTOs;
+using VacationRental.Api.Domain.Interfaces;
+using VacationRental.Api.Infrastructure.Repository;
+using VacationRental.Api.Mappers;
 using VacationRental.Api.Models;
 
 namespace VacationRental.Api.Controllers
@@ -9,51 +15,59 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class CalendarController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
-        private readonly IDictionary<int, BookingViewModel> _bookings;
+        private readonly ICalendarService _calendarService;
+        private IBookingRepository _bookingRepositiry;
+        private IRentalsRepository _rentalRepositiry;
 
         public CalendarController(
-            IDictionary<int, RentalViewModel> rentals,
-            IDictionary<int, BookingViewModel> bookings)
+            IBookingRepository bookingRespository,
+            IRentalsRepository rentalRespository,
+            ICalendarService caldendarService)
         {
-            _rentals = rentals;
-            _bookings = bookings;
+            _bookingRepositiry = bookingRespository;
+            _rentalRepositiry = rentalRespository;
+            _calendarService = caldendarService;
         }
 
         [HttpGet]
-        public CalendarViewModel Get(int rentalId, DateTime start, int nights)
+        public async Task<CalendarViewModel> Get(int rentalId, DateTime start, int nights)
         {
             if (nights < 0)
                 throw new ApplicationException("Nights must be positive");
-            if (!_rentals.ContainsKey(rentalId))
+            if (!_rentalRepositiry.KeyExist(rentalId))
                 throw new ApplicationException("Rental not found");
 
-            var result = new CalendarViewModel 
+            try
             {
-                RentalId = rentalId,
-                Dates = new List<CalendarDateViewModel>() 
-            };
-            for (var i = 0; i < nights; i++)
-            {
-                var date = new CalendarDateViewModel
+                var getCalendarInfoDto = new GetCaldendarDtoRequest()
                 {
-                    Date = start.Date.AddDays(i),
-                    Bookings = new List<CalendarBookingViewModel>()
+                    Nights = nights,
+                    RentalId = rentalId,
+                    Start = start
+                };
+                var domainBookings = new Dictionary<int, BookingDto>();
+                var domainRentals = new Dictionary<int, RentalDto>();
+                foreach (var booking in _bookingRepositiry.GetAllBookings())
+                {
+                    domainBookings.Add(booking.Key, BookingMapper.MapBookingModelIntoBookingDto(booking.Value));
+                }
+                foreach (var rental in _rentalRepositiry.GetAllRentals())
+                {
+                    domainRentals.Add(rental.Key, BookingMapper.MapRentalModelIntoRentalDto(rental.Value));
+                }
+                var response = _calendarService.GetCaldendarInformation(getCalendarInfoDto, domainBookings, domainRentals);
+                var result = new CalendarViewModel()
+                {
+                    Dates = response.Caldendar.Dates.Select(elem => BookingMapper.MapCalendarModelIntoCalendarDto(elem)).ToList(),
+                    RentalId = response.Caldendar.RentalId
                 };
 
-                foreach (var booking in _bookings.Values)
-                {
-                    if (booking.RentalId == rentalId
-                        && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)
-                    {
-                        date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id });
-                    }
-                }
-
-                result.Dates.Add(date);
+                return result;
             }
-
-            return result;
+            catch(Exception error)
+            {
+                throw new ApplicationException($"Error calling calendar get. Exception message is : {error.Message}");
+            }
         }
     }
 }

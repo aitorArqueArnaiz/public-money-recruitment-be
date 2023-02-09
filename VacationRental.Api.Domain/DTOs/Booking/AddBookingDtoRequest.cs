@@ -1,14 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 
-namespace VacationRental.Api.Models
+namespace VacationRental.Api.Domain.DTOs
 {
-    public class BookingBindingModel
+    public class AddBookingDtoRequest
     {
-        [JsonProperty("RentalId")]
         public int RentalId { get; set; }
 
-        [JsonProperty("DateTime")]
         public DateTime Start
         {
             get => _startIgnoreTime;
@@ -16,8 +13,6 @@ namespace VacationRental.Api.Models
         }
 
         private DateTime _startIgnoreTime;
-
-        [JsonProperty("Nights")]
         public int Nights { get; set; }
     }
 }

@@ -1,6 +1,7 @@
-﻿namespace VacationRental.Api.Models
+﻿
+namespace VacationRental.Api.Domain.DTOs
 {
-    public class RentalViewModel
+    public class RentalDto
     {
         public int Id { get; set; }
         public int Units { get; set; }

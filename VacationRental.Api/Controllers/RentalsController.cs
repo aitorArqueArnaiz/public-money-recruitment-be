@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using VacationRental.Api.Infrastructure.Repository;
 using VacationRental.Api.Models;
 
 namespace VacationRental.Api.Controllers
@@ -9,32 +11,33 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class RentalsController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
+        private IRentalsRepository _rentalRespository;
 
-        public RentalsController(IDictionary<int, RentalViewModel> rentals)
+        public RentalsController(IDictionary<int, RentalViewModel> rentals, IRentalsRepository rentalRepository)
         {
-            _rentals = rentals;
+            _rentalRespository = rentalRepository;
         }
 
         [HttpGet]
         [Route("{rentalId:int}")]
-        public RentalViewModel Get(int rentalId)
+        public async Task<RentalViewModel> Get(int rentalId)
         {
-            if (!_rentals.ContainsKey(rentalId))
+            if (!_rentalRespository.KeyExist(rentalId))
                 throw new ApplicationException("Rental not found");
 
-            return _rentals[rentalId];
+            return _rentalRespository.GetRentalById(rentalId);
         }
 
         [HttpPost]
-        public ResourceIdViewModel Post(RentalBindingModel model)
+        public async Task<ResourceIdViewModel> Post(RentalBindingModel model)
         {
-            var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
+            var key = new ResourceIdViewModel { Id = _rentalRespository.GetAllRentals().Keys.Count + 1 };
 
-            _rentals.Add(key.Id, new RentalViewModel
+            _rentalRespository.AddRental(key.Id, new RentalViewModel
             {
                 Id = key.Id,
-                Units = model.Units
+                Units = model.Units,
+                PreparationTimeInDays = model.PreparationTimeInDays
             });
 
             return key;
